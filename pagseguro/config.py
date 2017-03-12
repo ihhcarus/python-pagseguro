@@ -14,6 +14,7 @@ class Config(dict):
         checkout_suffix = '{}checkout'.format(version)
         session_checkout_suffix = '{}sessions/'.format(version)
         notification_suffix = '{}transactions/notifications/%s'.format(version)
+        pre_approval_suffix = '{}pre-approvals/request'.format(version)
         pre_approval_notification_suffix = ('{}pre-approvals/'
                                             'notifications/%s'.format(version))
         transaction_suffix = '{}transactions/%s'.format(version)
@@ -22,8 +23,10 @@ class Config(dict):
 
         # default config settings
         defaults = dict(
-            PRE_APPROVAL_PAYMENT_URL='{}{}pre-approvals/payment'.format(
-                base_url, version),
+            PRE_APPROVAL_URL='{}{}'.format(
+                base_url, pre_approval_suffix),
+            PRE_APPROVAL_PAYMENT_URL='{}{}.html?code=%s'.format(
+                payment_host, pre_approval_suffix),
             PRE_APPROVAL_CANCEL_URL='{}{}pre-approvals/cancel/%s'.format(
                 base_url, version),
             SESSION_CHECKOUT_URL='{}{}'.format(

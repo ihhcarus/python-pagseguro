@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import logging
-
-from .utils import parse_date
-from .config import Config
-
 import xmltodict
+
+from .config import Config
+from .utils import parse_date
+
 
 logger = logging.getLogger()
 
@@ -86,6 +86,11 @@ class PagSeguroCheckoutSession(XMLParser):
 
 
 class PagSeguroPreApprovalPayment(XMLParser):
+    date = None
+    payment_url = None
+    transaction = None
+    payment_link = None
+
     def __init__(self, xml, config=None):
         self.code = None
         super(PagSeguroPreApprovalPayment, self).__init__(xml, config)
@@ -94,9 +99,13 @@ class PagSeguroPreApprovalPayment(XMLParser):
         parsed = super(PagSeguroPreApprovalPayment, self).parse_xml(xml)
         if self.errors:
             return
-        result = parsed.get('result', {})
-        self.code = result.get('transactionCode')
-        self.date = parse_date(result.get('date'))
+        checkout = parsed.get('preApprovalRequest', {})
+        self.code = checkout.get('code')
+        self.date = parse_date(checkout.get('date'))
+        self.payment_url = self.config.PRE_APPROVAL_PAYMENT_URL % self.code
+        # this is used only for transparent checkout process
+        self.transaction = parsed.get('transaction', {})
+        self.payment_link = self.transaction.get('paymentLink')
 
 
 class PagSeguroCheckoutResponse(XMLParser):
@@ -153,7 +162,6 @@ class PagSeguroTransactionSearchResult(XMLParser):
 
 
 class PagSeguroPreApproval(XMLParser):
-
     def __getitem__(self, key):
         getattr(self, key, None)
 
@@ -174,7 +182,6 @@ class PagSeguroPreApproval(XMLParser):
 
 
 class PagSeguroPreApprovalSearch(XMLParser):
-
     current_page = None
     total_pages = None
     results_in_page = None

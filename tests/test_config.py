@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from pagseguro.config import Config
-
 import pytest
+
+from pagseguro.config import Config
 
 
 @pytest.fixture
@@ -14,7 +14,7 @@ def custom_config():
 
 @pytest.fixture
 def common_config():
-    return { # flake8: noqa
+    return {  # flake8: noqa
         'CHECKOUT_URL': 'https://ws.pagseguro.uol.com.br/v2/checkout',
         'CURRENCY': 'BRL',
         'DATETIME_FORMAT': '%Y-%m-%dT%H:%M:%S',
@@ -23,7 +23,8 @@ def common_config():
         'PAYMENT_URL': 'https://pagseguro.uol.com.br/v2/checkout/payment.html?code=%s',
         'PRE_APPROVAL_CANCEL_URL': 'https://ws.pagseguro.uol.com.br/v2/pre-approvals/cancel/%s',
         'PRE_APPROVAL_NOTIFICATION_URL': 'https://ws.pagseguro.uol.com.br/v2/pre-approvals/notifications/%s',
-        'PRE_APPROVAL_PAYMENT_URL': 'https://ws.pagseguro.uol.com.br/v2/pre-approvals/payment',
+        'PRE_APPROVAL_URL': 'https://ws.pagseguro.uol.com.br/v2/pre-approvals/request',
+        'PRE_APPROVAL_PAYMENT_URL': 'https://pagseguro.uol.com.br/v2/pre-approvals/request.html?code=%s',
         'QUERY_PRE_APPROVAL_URL': 'https://ws.pagseguro.uol.com.br/v2/pre-approvals',
         'QUERY_TRANSACTION_URL': 'https://ws.pagseguro.uol.com.br/v2/transactions',
         'SESSION_CHECKOUT_URL': 'https://ws.pagseguro.uol.com.br/v2/sessions/',
@@ -42,6 +43,7 @@ def test_common_config(common_config):
 def test_custom_config(custom_config):
     c = Config(**custom_config)
     assert c.PAYMENT_URL == custom_config['payment_url']
+
 
 def test_config_special_methods():
     c = Config()

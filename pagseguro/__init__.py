@@ -243,8 +243,9 @@ class PagSeguro(object):
 
     def pre_approval_ask_payment(self, **kwargs):
         """ ask form a subscribe payment """
+        self.data['currency'] = self.config.CURRENCY
         self.build_pre_approval_payment_params(**kwargs)
-        response = self.post(url=self.config.PRE_APPROVAL_PAYMENT_URL)
+        response = self.post(url=self.config.PRE_APPROVAL_URL)
         return PagSeguroPreApprovalPayment(response.content, self.config)
 
     def pre_approval_cancel(self, code):
