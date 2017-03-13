@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from pagseguro import PagSeguro, PagSeguroTransactionSearchResult
-from pagseguro.config import Config
-from pagseguro.exceptions import PagSeguroValidationError
-from pagseguro.utils import is_valid_email, is_valid_cpf
+from pagseguro_v2 import PagSeguro, PagSeguroTransactionSearchResult
+from pagseguro_v2.config import Config
+from pagseguro_v2.exceptions import PagSeguroValidationError
+from pagseguro_v2.utils import is_valid_email, is_valid_cpf
+
 
 TOKEN = '123456'
 EMAIL = 'seu@email.com'

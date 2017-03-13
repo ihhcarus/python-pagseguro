@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from pagseguro import PagSeguro
+from pagseguro_v2 import PagSeguro
 
 
 @pytest.fixture(scope='session')

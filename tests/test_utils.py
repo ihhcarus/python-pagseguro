@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 import datetime
 
-from pagseguro.utils import (is_valid_cpf, is_valid_cnpj, is_valid_email,
-                             parse_date)
-from pagseguro.exceptions import PagSeguroValidationError
-
 import pytest
 from dateutil.tz import tzutc
+
+from pagseguro_v2.exceptions import PagSeguroValidationError
+from pagseguro_v2.utils import (is_valid_cpf, is_valid_cnpj, is_valid_email,
+                                parse_date)
 
 
 def test_is_valid_email():

@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from pagseguro import PagSeguro, PagSeguroTransactionSearchResult
-from pagseguro.exceptions import PagSeguroValidationError
-from pagseguro.utils import is_valid_email, is_valid_cpf
+from pagseguro_v2 import PagSeguro, PagSeguroTransactionSearchResult
+from pagseguro_v2.exceptions import PagSeguroValidationError
+from pagseguro_v2.utils import is_valid_email, is_valid_cpf
+
 
 TOKEN = 'sandbox_token'
 EMAIL = 'pagseguro_email'

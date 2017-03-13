@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from pagseguro.config import Config
+from pagseguro_v2.config import Config
 
 
 @pytest.fixture
