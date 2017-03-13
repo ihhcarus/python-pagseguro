@@ -19,7 +19,7 @@ setup(
     author_email='rochacbruno@gmail.com',
     url='https://github.com/rochacbruno/python-pagseguro',
     packages=['pagseguro', ],
-    package_dir={'pagseguro': 'pagseguro'},
+    package_dir={'pagseguro': 'pagseguro_v2'},
     include_package_data=True,
     install_requires=requirements,
     license='MIT',
