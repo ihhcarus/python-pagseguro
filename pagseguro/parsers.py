@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
+
+
 import logging
+
 import xmltodict
 
 from .config import Config
@@ -19,6 +22,9 @@ class XMLParser(object):
         self.parse_xml(xml)
         logger.debug(self.__dict__)
 
+    def __getitem__(self, key):
+        return getattr(self, key, None)
+
     def parse_xml(self, xml):
         try:
             parsed = xmltodict.parse(xml, encoding="iso-8859-1")
@@ -33,38 +39,8 @@ class XMLParser(object):
 
 
 class PagSeguroNotificationResponse(XMLParser):
-    def __getitem__(self, key):
-        getattr(self, key, None)
-
     def parse_xml(self, xml):
         parsed = super(PagSeguroNotificationResponse, self).parse_xml(xml)
-        if self.errors:
-            return
-        transaction = parsed.get('transaction', {})
-        for k, v in transaction.items():
-            setattr(self, k, v)
-
-
-class PagSeguroPreApprovalNotificationResponse(XMLParser):
-    def __getitem__(self, key):
-        getattr(self, key, None)
-
-    def parse_xml(self, xml):
-        parsed = super(PagSeguroPreApprovalNotificationResponse,
-                       self).parse_xml(xml)
-        if self.errors:
-            return
-        transaction = parsed.get('transaction', {})
-        for k, v in transaction.items():
-            setattr(self, k, v)
-
-
-class PagSeguroPreApprovalCancel(XMLParser):
-    def __getitem__(self, key):
-        getattr(self, key, None)
-
-    def parse_xml(self, xml):
-        parsed = super(PagSeguroPreApprovalCancel, self).parse_xml(xml)
         if self.errors:
             return
         transaction = parsed.get('transaction', {})
@@ -85,37 +61,12 @@ class PagSeguroCheckoutSession(XMLParser):
         self.session_id = session.get('id')
 
 
-class PagSeguroPreApprovalPayment(XMLParser):
+class PagSeguroCheckoutResponse(XMLParser):
+    code = None
     date = None
     payment_url = None
-    transaction = None
     payment_link = None
-
-    def __init__(self, xml, config=None):
-        self.code = None
-        super(PagSeguroPreApprovalPayment, self).__init__(xml, config)
-
-    def parse_xml(self, xml):
-        parsed = super(PagSeguroPreApprovalPayment, self).parse_xml(xml)
-        if self.errors:
-            return
-        checkout = parsed.get('preApprovalRequest', {})
-        self.code = checkout.get('code')
-        self.date = parse_date(checkout.get('date'))
-        self.payment_url = self.config.PRE_APPROVAL_PAYMENT_URL % self.code
-        # this is used only for transparent checkout process
-        self.transaction = parsed.get('transaction', {})
-        self.payment_link = self.transaction.get('paymentLink')
-
-
-class PagSeguroCheckoutResponse(XMLParser):
-    def __init__(self, xml, config=None):
-        self.code = None
-        self.date = None
-        self.payment_url = None
-        self.payment_link = None
-        self.transaction = None
-        super(PagSeguroCheckoutResponse, self).__init__(xml, config)
+    transaction = None
 
     def parse_xml(self, xml):
         parsed = super(PagSeguroCheckoutResponse, self).parse_xml(xml)
@@ -124,9 +75,7 @@ class PagSeguroCheckoutResponse(XMLParser):
         checkout = parsed.get('checkout', {})
         self.code = checkout.get('code')
         self.date = parse_date(checkout.get('date'))
-
         self.payment_url = self.config.PAYMENT_URL % self.code
-
         # this is used only for transparent checkout process
         self.transaction = parsed.get('transaction', {})
         self.payment_link = self.transaction.get('paymentLink')
@@ -137,9 +86,6 @@ class PagSeguroTransactionSearchResult(XMLParser):
     total_pages = None
     results_in_page = None
     transactions = []
-
-    def __getitem__(self, key):
-        getattr(self, key, None)
 
     def parse_xml(self, xml):
         parsed = super(PagSeguroTransactionSearchResult, self).parse_xml(xml)
@@ -162,9 +108,6 @@ class PagSeguroTransactionSearchResult(XMLParser):
 
 
 class PagSeguroPreApproval(XMLParser):
-    def __getitem__(self, key):
-        getattr(self, key, None)
-
     def parse_xml(self, xml):
         parsed = super(PagSeguroPreApproval, self).parse_xml(xml)
         if self.errors:
@@ -181,14 +124,41 @@ class PagSeguroPreApproval(XMLParser):
         self.sender = result.get('sender', {})
 
 
+class PagSeguroPreApprovalPayment(XMLParser):
+    code = None
+    date = None
+    payment_url = None
+    transaction = None
+    payment_link = None
+
+    def parse_xml(self, xml):
+        parsed = super(PagSeguroPreApprovalPayment, self).parse_xml(xml)
+        if self.errors:
+            return
+        checkout = parsed.get('preApprovalRequest', {})
+        self.code = checkout.get('code')
+        self.date = parse_date(checkout.get('date'))
+        self.payment_url = self.config.PRE_APPROVAL_PAYMENT_URL % self.code
+        # this is used only for transparent checkout process
+        self.transaction = parsed.get('transaction', {})
+        self.payment_link = self.transaction.get('paymentLink')
+
+
+class PagSeguroPreApprovalCancel(XMLParser):
+    def parse_xml(self, xml):
+        parsed = super(PagSeguroPreApprovalCancel, self).parse_xml(xml)
+        if self.errors:
+            return
+        transaction = parsed.get('transaction', {})
+        for k, v in transaction.items():
+            setattr(self, k, v)
+
+
 class PagSeguroPreApprovalSearch(XMLParser):
     current_page = None
     total_pages = None
     results_in_page = None
     pre_approvals = []
-
-    def __getitem__(self, key):
-        getattr(self, key, None)
 
     def parse_xml(self, xml):
         parsed = super(PagSeguroPreApprovalSearch, self).parse_xml(xml)
@@ -208,3 +178,14 @@ class PagSeguroPreApprovalSearch(XMLParser):
         self.total_pages = search_result.get('totalPages', None)
         if self.total_pages is not None:
             self.total_pages = int(self.total_pages)
+
+
+class PagSeguroPreApprovalNotificationResponse(XMLParser):
+    def parse_xml(self, xml):
+        parsed = super(PagSeguroPreApprovalNotificationResponse,
+                       self).parse_xml(xml)
+        if self.errors:
+            return
+        transaction = parsed.get('transaction', {})
+        for k, v in transaction.items():
+            setattr(self, k, v)
