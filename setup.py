@@ -10,10 +10,9 @@ readme = open('README.md').read()
 with open('requirements.txt') as reqs:
     requirements = reqs.read().split()
 
-
 setup(
     name='pagseguro',
-    version='0.4',
+    version='0.4.1',
     description='Pagseguro API v2 wrapper',
     author='Bruno Rocha',
     author_email='rochacbruno@gmail.com',

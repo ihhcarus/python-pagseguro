@@ -291,6 +291,33 @@ class PagSeguro(object):
         response = self.get(url=self.config.QUERY_TRANSACTION_URL)
         return PagSeguroTransactionSearchResult(response.content, self.config)
 
+    def query_transactions_by_reference(self, reference, page=None, max_results=None):
+        """ query transaction by reference code """
+        last_page = False
+        results = []
+        while last_page is False:
+            search_result = self._consume_query_transactions_by_reference(reference, page, max_results)
+            results.extend(search_result.transactions)
+            if search_result.current_page is None or \
+               search_result.total_pages is None or \
+               search_result.current_page == search_result.total_pages:
+                last_page = True
+            else:
+                page = search_result.current_page + 1
+
+        return results
+
+    def _consume_query_transactions_by_reference(self, reference, page=None, max_results=None):
+        querystring = {
+            'reference': reference,
+            'page': page,
+            'maxPageResults': max_results,
+        }
+        self.data.update(querystring)
+        self.clean_none_params()
+        response = self.get(url=self.config.QUERY_TRANSACTION_URL)
+        return PagSeguroTransactionSearchResult(response.content, self.config)
+
     def query_pre_approvals(self, initial_date, final_date, page=None,
                             max_results=None):
         """ query pre-approvals by date range """
