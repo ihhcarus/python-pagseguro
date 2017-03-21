@@ -1,9 +1,11 @@
 # coding: utf-8
+
+
 import logging
+
 import requests
 
 from .config import Config
-from .utils import is_valid_email, is_valid_cpf, is_valid_cnpj
 from .parsers import (PagSeguroNotificationResponse,
                       PagSeguroPreApprovalNotificationResponse,
                       PagSeguroPreApprovalCancel,
@@ -12,7 +14,10 @@ from .parsers import (PagSeguroNotificationResponse,
                       PagSeguroCheckoutResponse,
                       PagSeguroTransactionSearchResult,
                       PagSeguroPreApproval,
-                      PagSeguroPreApprovalSearch)
+                      PagSeguroPreApprovalSearch,
+                      PagSeguroPreApprovalResponse)
+from .utils import is_valid_email, is_valid_cpf, is_valid_cnpj
+
 
 logger = logging.getLogger()
 
@@ -159,6 +164,8 @@ class PagSeguro(object):
                 'final_date')
             params['preApprovalMaxTotalAmount'] = self.pre_approval.get(
                 'max_total_amount')
+            params['expirationValue'] = self.pre_approval.get('expiration_value')
+            params['expirationUnit'] = self.pre_approval.get('expiration_unit')
 
         self.data.update(params)
         self.clean_none_params()
@@ -242,11 +249,11 @@ class PagSeguro(object):
             response.content, self.config)
 
     def pre_approval_ask_payment(self, **kwargs):
-        """ ask form a subscribe payment """
+        """ create a pagseguro pre approval subscription """
         self.data['currency'] = self.config.CURRENCY
-        self.build_pre_approval_payment_params(**kwargs)
+        self.build_checkout_params(**kwargs)
         response = self.post(url=self.config.PRE_APPROVAL_URL)
-        return PagSeguroPreApprovalPayment(response.content, self.config)
+        return PagSeguroPreApprovalResponse(response.content, config=self.config)
 
     def pre_approval_cancel(self, code):
         """ cancel a subscribe """

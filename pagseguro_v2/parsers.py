@@ -124,7 +124,7 @@ class PagSeguroPreApproval(XMLParser):
         self.sender = result.get('sender', {})
 
 
-class PagSeguroPreApprovalPayment(XMLParser):
+class PagSeguroPreApprovalResponse(XMLParser):
     code = None
     date = None
     payment_url = None
@@ -132,7 +132,7 @@ class PagSeguroPreApprovalPayment(XMLParser):
     payment_link = None
 
     def parse_xml(self, xml):
-        parsed = super(PagSeguroPreApprovalPayment, self).parse_xml(xml)
+        parsed = super(PagSeguroPreApprovalResponse, self).parse_xml(xml)
         if self.errors:
             return
         checkout = parsed.get('preApprovalRequest', {})
@@ -142,6 +142,19 @@ class PagSeguroPreApprovalPayment(XMLParser):
         # this is used only for transparent checkout process
         self.transaction = parsed.get('transaction', {})
         self.payment_link = self.transaction.get('paymentLink')
+
+
+class PagSeguroPreApprovalPayment(XMLParser):
+    code = None
+    date = None
+
+    def parse_xml(self, xml):
+        parsed = super(PagSeguroPreApprovalPayment, self).parse_xml(xml)
+        if self.errors:
+            return
+        result = parsed.get('result', {})
+        self.code = result.get('transactionCode')
+        self.date = parse_date(result.get('date'))
 
 
 class PagSeguroPreApprovalCancel(XMLParser):
