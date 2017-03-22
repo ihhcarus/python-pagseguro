@@ -15,7 +15,7 @@ from .parsers import (PagSeguroNotificationResponse,
                       PagSeguroTransactionSearchResult,
                       PagSeguroPreApproval,
                       PagSeguroPreApprovalSearch,
-                      PagSeguroPreApprovalResponse)
+                      PagSeguroPreApprovalResponse, PagSeguroPreApprovalPaymentOrders)
 from .utils import is_valid_email, is_valid_cpf, is_valid_cnpj
 
 
@@ -213,9 +213,12 @@ class PagSeguro(object):
             value = value[len(self.reference_prefix):]
         self._reference = value
 
-    def get(self, url):
+    def get(self, url, extra_headers=None):
         """ do a get transaction """
-        return requests.get(url, params=self.data, headers=self.config.HEADERS)
+        headers = self.config.HEADERS
+        if extra_headers:
+            headers.update(extra_headers)
+        return requests.get(url, params=self.data, headers=headers)
 
     def post(self, url):
         """ do a post request """
@@ -241,6 +244,11 @@ class PagSeguro(object):
         response = self.get(url=self.config.NOTIFICATION_URL % code)
         return PagSeguroNotificationResponse(response.content, self.config)
 
+    def check_pre_approval(self, code):
+        """ check a pre-approval by its code """
+        response = self.get(url=self.config.PRE_APPROVAL_CHECK_URL % code)
+        return PagSeguroPreApprovalSearch(response.content, self.config)
+
     def check_pre_approval_notification(self, code):
         """ check a notification by its code """
         response = self.get(
@@ -265,9 +273,7 @@ class PagSeguro(object):
         response = self.get(url=self.config.TRANSACTION_URL % code)
         return PagSeguroNotificationResponse(response.content, self.config)
 
-    def query_transactions(self, initial_date, final_date,
-                           page=None,
-                           max_results=None):
+    def query_transactions(self, initial_date, final_date, page=None, max_results=None):
         """ query transaction by date range """
         last_page = False
         results = []
@@ -281,12 +287,9 @@ class PagSeguro(object):
                 last_page = True
             else:
                 page = search_result.current_page + 1
-
         return results
 
-    def _consume_query_transactions(self, initial_date, final_date,
-                                    page=None,
-                                    max_results=None):
+    def _consume_query_transactions(self, initial_date, final_date, page=None, max_results=None):
         querystring = {
             'initialDate': initial_date.strftime('%Y-%m-%dT%H:%M'),
             'finalDate': final_date.strftime('%Y-%m-%dT%H:%M'),
@@ -311,7 +314,6 @@ class PagSeguro(object):
                 last_page = True
             else:
                 page = search_result.current_page + 1
-
         return results
 
     def _consume_query_transactions_by_reference(self, reference, page=None, max_results=None):
@@ -325,8 +327,7 @@ class PagSeguro(object):
         response = self.get(url=self.config.QUERY_TRANSACTION_URL)
         return PagSeguroTransactionSearchResult(response.content, self.config)
 
-    def query_pre_approvals(self, initial_date, final_date, page=None,
-                            max_results=None):
+    def query_pre_approvals(self, initial_date, final_date, page=None, max_results=None):
         """ query pre-approvals by date range """
         last_page = False
         results = []
@@ -340,35 +341,44 @@ class PagSeguro(object):
                 last_page = True
             else:
                 page = search_result.current_page + 1
-
         return results
 
-    def _consume_query_pre_approvals(self, initial_date, final_date, page=None,
-                                     max_results=None):
+    def _consume_query_pre_approvals(self, initial_date, final_date, page=None, max_results=None):
         querystring = {
             'initialDate': initial_date.strftime('%Y-%m-%dT%H:%M'),
             'finalDate': final_date.strftime('%Y-%m-%dT%H:%M'),
             'page': page,
             'maxPageResults': max_results,
         }
-
         self.data.update(querystring)
         self.clean_none_params()
-
         response = self.get(url=self.config.QUERY_PRE_APPROVAL_URL)
         return PagSeguroPreApprovalSearch(response.content, self.config)
 
-    def query_pre_approvals_by_code(self, code):
-        """ query pre-approvals by code """
-        result = self._consume_query_pre_approvals_by_code(code)
-        return result
+    def query_pre_approvals_payment_orders(self, code, page=None, max_results=None):
+        """ query the payment orders of a pre-approval """
+        last_page = False
+        results = []
+        while last_page is False:
+            search_result = self._consume_query_pre_approvals_payment_orders(code, page, max_results)
+            results.extend(search_result.payment_orders)
+            if search_result.current_page is None or \
+               search_result.total_pages is None or \
+               search_result.current_page == search_result.total_pages:
+                last_page = True
+            else:
+                page = search_result.current_page + 1
+        return results
 
-    def _consume_query_pre_approvals_by_code(self, code):
-
-        response = self.get(
-            url='%s/%s' % (self.config.QUERY_PRE_APPROVAL_URL, code)
-        )
-        return PagSeguroPreApproval(response.content, self.config)
+    def _consume_query_pre_approvals_payment_orders(self, code, page=None, max_results=None):
+        querystring = {
+            'page': page,
+            'maxPageResults': max_results,
+        }
+        self.data.update(querystring)
+        self.clean_none_params()
+        response = self.get(url=self.config.PRE_APPROVAL_PAYMENT_ORDERS_URL % code, extra_headers=self.config.HEADER_ACCEPT)
+        return PagSeguroPreApprovalPaymentOrders(response.content, self.config)
 
     def add_item(self, **kwargs):
         self.items.append(kwargs)

@@ -202,3 +202,30 @@ class PagSeguroPreApprovalNotificationResponse(XMLParser):
         transaction = parsed.get('transaction', {})
         for k, v in transaction.items():
             setattr(self, k, v)
+
+
+class PagSeguroPreApprovalPaymentOrders(XMLParser):
+    current_page = None
+    total_pages = None
+    results_in_page = None
+    payment_orders = []
+
+    def parse_xml(self, xml):
+        parsed = super(PagSeguroPreApprovalPaymentOrders, self).parse_xml(xml)
+        if self.errors:
+            return
+        search_result = parsed.get('paymentOrdersResult', {})
+        self.payment_orders = search_result.get('paymentOrders', {})
+        self.payment_orders = self.payment_orders.get('paymentOrder', [])
+        if not isinstance(self.payment_orders, list):
+            self.payment_orders = [self.payment_orders]
+        self.current_page = search_result.get('currentPage', None)
+        if self.current_page is not None:
+            self.current_page = int(self.current_page)
+        self.results_in_page = search_result.get('resultsInThisPage', None)
+        if self.results_in_page is not None:
+            self.results_in_page = int(self.results_in_page)
+        self.total_pages = search_result.get('totalPages', None)
+        if self.total_pages is not None:
+            self.total_pages = int(self.total_pages)
+

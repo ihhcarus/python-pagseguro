@@ -14,9 +14,10 @@ class Config(dict):
         checkout_suffix = '{}checkout'.format(version)
         session_checkout_suffix = '{}sessions/'.format(version)
         notification_suffix = '{}transactions/notifications/%s'.format(version)
-        pre_approval_suffix = '{}pre-approvals/request'.format(version)
-        pre_approval_notification_suffix = ('{}pre-approvals/'
-                                            'notifications/%s'.format(version))
+        pre_approval_request_suffix = '{}pre-approvals/request'.format(version)
+        pre_approval_notification_suffix = ('{}pre-approvals/notifications/%s'.format(version))
+        pre_approval_check_suffix = '{}pre-approvals/%s'.format(version)
+        query_pre_approval_suffix = '{}pre-approvals'.format(version)
         transaction_suffix = '{}transactions/%s'.format(version)
         query_transaction_suffix = '{}transactions'.format(version)
         ctype = 'application/x-www-form-urlencoded; charset=UTF-8'
@@ -24,9 +25,11 @@ class Config(dict):
         # default config settings
         defaults = dict(
             PRE_APPROVAL_URL='{}{}'.format(
-                base_url, pre_approval_suffix),
+                base_url, pre_approval_request_suffix),
+            PRE_APPROVAL_CHECK_URL='{}{}'.format(base_url, pre_approval_check_suffix),
+            PRE_APPROVAL_PAYMENT_ORDERS_URL='{}/pre-approvals/%s/payment-orders'.format(base_url),  # Não tem em v2 essa chamada
             PRE_APPROVAL_PAYMENT_URL='{}{}.html?code=%s'.format(
-                payment_host, pre_approval_suffix),
+                payment_host, pre_approval_request_suffix),
             PRE_APPROVAL_CANCEL_URL='{}{}pre-approvals/cancel/%s'.format(
                 base_url, version),
             SESSION_CHECKOUT_URL='{}{}'.format(
@@ -40,10 +43,11 @@ class Config(dict):
             TRANSACTION_URL='{}{}'.format(base_url, transaction_suffix),
             QUERY_TRANSACTION_URL='{}{}'.format(
                 base_url, query_transaction_suffix),
-            QUERY_PRE_APPROVAL_URL='{}{}pre-approvals'.format(
-                base_url, version),
+            QUERY_PRE_APPROVAL_URL='{}{}'.format(
+                base_url, query_pre_approval_suffix),
             CURRENCY='BRL',
             HEADERS={'Content-Type': ctype},
+            HEADER_ACCEPT={'Accept': 'application/vnd.pagseguro.com.br.v3+xml;charset=ISO-8859-1'},  # Header que é necessário em chamadas de v1
             PAYMENT_URL='{}{}/payment.html?code=%s'.format(
                 payment_host, checkout_suffix),
             DATETIME_FORMAT='%Y-%m-%dT%H:%M:%S',
