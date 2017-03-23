@@ -56,6 +56,8 @@ class PagSeguro(object):
         self.pre_approval = {}
         self.checkout_session = None
         self.payment = {}
+        self.max_age = None
+        self.max_uses = None
 
     def build_checkout_params(self, **kwargs):
         """ build a dict with params """
@@ -95,6 +97,8 @@ class PagSeguro(object):
 
         params['reference'] = self.reference
         params['receiverEmail'] = self.data['email']
+        params['maxAge'] = self.max_age
+        params['maxUses'] = self.max_uses
 
         if self.redirect_url:
             params['redirectURL'] = self.redirect_url
