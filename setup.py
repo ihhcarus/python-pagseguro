@@ -12,7 +12,7 @@ with open('requirements.txt') as reqs:
 
 setup(
     name='pagseguro',
-    version='0.4.4',
+    version='0.4.5',
     description='Pagseguro API v2 wrapper',
     author='Bruno Rocha',
     author_email='rochacbruno@gmail.com',

@@ -251,7 +251,7 @@ class PagSeguro(object):
     def check_pre_approval(self, code):
         """ check a pre-approval by its code """
         response = self.get(url=self.config.PRE_APPROVAL_CHECK_URL % code)
-        return PagSeguroPreApprovalSearch(response.content, self.config)
+        return PagSeguroPreApproval(response.content, self.config)
 
     def check_pre_approval_notification(self, code):
         """ check a notification by its code """
