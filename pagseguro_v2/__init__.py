@@ -224,9 +224,20 @@ class PagSeguro(object):
             headers.update(extra_headers)
         return requests.get(url, params=self.data, headers=headers)
 
-    def post(self, url):
+    def post(self, url, extra_headers=None):
         """ do a post request """
-        return requests.post(url, data=self.data, headers=self.config.HEADERS)
+        headers = self.config.HEADERS
+        if extra_headers:
+            headers.update(extra_headers)
+        return requests.post(url, data=self.data, headers=headers)
+
+    def put(self, url, extra_headers=None):
+        """ do a put request """
+        headers = self.config.HEADERS
+        if extra_headers:
+            headers.update(extra_headers)
+        headers.update({'Content-Type': 'application/xml'})
+        return requests.put(url, params=self.data, headers=headers)
 
     def checkout(self, transparent=False, **kwargs):
         """ create a pagseguro checkout """
@@ -269,8 +280,8 @@ class PagSeguro(object):
 
     def pre_approval_cancel(self, code):
         """ cancel a subscribe """
-        response = self.get(url=self.config.PRE_APPROVAL_CANCEL_URL % code)
-        return PagSeguroPreApprovalCancel(response.content, self.config)
+        response = self.put(url=self.config.PRE_APPROVAL_CANCEL_URL % code, extra_headers=self.config.HEADER_ACCEPT)
+        return PagSeguroPreApprovalCancel(response, response.content, self.config)
 
     def check_transaction(self, code):
         """ check a transaction by its code """

@@ -16,7 +16,8 @@ class Config(dict):
         notification_suffix = '{}transactions/notifications/%s'.format(version)
         pre_approval_request_suffix = '{}pre-approvals/request'.format(version)
         pre_approval_notification_suffix = ('{}pre-approvals/notifications/%s'.format(version))
-        pre_approval_check_suffix = '{}pre-approvals/%s'.format(version)
+        pre_approval_v1_check_suffix = 'pre-approvals/%s'
+        pre_approval_check_suffix = '{}'.format(version, pre_approval_v1_check_suffix)
         query_pre_approval_suffix = '{}pre-approvals'.format(version)
         transaction_suffix = '{}transactions/%s'.format(version)
         query_transaction_suffix = '{}transactions'.format(version)
@@ -27,11 +28,9 @@ class Config(dict):
             PRE_APPROVAL_URL='{}{}'.format(
                 base_url, pre_approval_request_suffix),
             PRE_APPROVAL_CHECK_URL='{}{}'.format(base_url, pre_approval_check_suffix),
-            PRE_APPROVAL_PAYMENT_ORDERS_URL='{}/pre-approvals/%s/payment-orders'.format(base_url),  # Não tem em v2 essa chamada
-            PRE_APPROVAL_PAYMENT_URL='{}{}.html?code=%s'.format(
-                payment_host, pre_approval_request_suffix),
-            PRE_APPROVAL_CANCEL_URL='{}{}pre-approvals/cancel/%s'.format(
-                base_url, version),
+            PRE_APPROVAL_PAYMENT_ORDERS_URL='{}/{}/payment-orders'.format(base_url, pre_approval_v1_check_suffix),
+            PRE_APPROVAL_CANCEL_URL='{}/{}/cancel/'.format(base_url, pre_approval_v1_check_suffix),
+            PRE_APPROVAL_PAYMENT_URL='{}{}.html?code=%s'.format(payment_host, pre_approval_request_suffix),
             SESSION_CHECKOUT_URL='{}{}'.format(
                 base_url, session_checkout_suffix),
             TRANSPARENT_CHECKOUT_URL='{}{}'.format(

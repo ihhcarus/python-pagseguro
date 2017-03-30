@@ -158,13 +158,15 @@ class PagSeguroPreApprovalPayment(XMLParser):
 
 
 class PagSeguroPreApprovalCancel(XMLParser):
+    def __init__(self, request, xml, config=None):
+        u""" :type request: requests.models.Response """
+        super(PagSeguroPreApprovalCancel, self).__init__(xml, config)
+        self.canceled = request.status_code == 204  # no response data so we check the success using the response status code
+
     def parse_xml(self, xml):
-        parsed = super(PagSeguroPreApprovalCancel, self).parse_xml(xml)
+        _ = super(PagSeguroPreApprovalCancel, self).parse_xml(xml)
         if self.errors:
             return
-        transaction = parsed.get('transaction', {})
-        for k, v in transaction.items():
-            setattr(self, k, v)
 
 
 class PagSeguroPreApprovalSearch(XMLParser):
@@ -228,4 +230,3 @@ class PagSeguroPreApprovalPaymentOrders(XMLParser):
         self.total_pages = search_result.get('totalPages', None)
         if self.total_pages is not None:
             self.total_pages = int(self.total_pages)
-
