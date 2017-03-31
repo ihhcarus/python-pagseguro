@@ -17,7 +17,7 @@ class Config(dict):
         pre_approval_request_suffix = '{}pre-approvals/request'.format(version)
         pre_approval_notification_suffix = ('{}pre-approvals/notifications/%s'.format(version))
         pre_approval_v1_check_suffix = 'pre-approvals/%s'
-        pre_approval_check_suffix = '{}'.format(version, pre_approval_v1_check_suffix)
+        pre_approval_check_suffix = '{}{}'.format(version, pre_approval_v1_check_suffix)
         query_pre_approval_suffix = '{}pre-approvals'.format(version)
         transaction_suffix = '{}transactions/%s'.format(version)
         query_transaction_suffix = '{}transactions'.format(version)

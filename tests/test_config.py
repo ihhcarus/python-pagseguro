@@ -21,6 +21,7 @@ def common_config():
         'HEADERS': {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
         'NOTIFICATION_URL': 'https://ws.pagseguro.uol.com.br/v2/transactions/notifications/%s',
         'PAYMENT_URL': 'https://pagseguro.uol.com.br/v2/checkout/payment.html?code=%s',
+        'PRE_APPROVAL_CHECK_URL': 'https://ws.pagseguro.uol.com.br/v2/pre-approvals/%s',
         'PRE_APPROVAL_CANCEL_URL': 'https://ws.pagseguro.uol.com.br/pre-approvals/%s/cancel/',
         'PRE_APPROVAL_NOTIFICATION_URL': 'https://ws.pagseguro.uol.com.br/v2/pre-approvals/notifications/%s',
         'PRE_APPROVAL_URL': 'https://ws.pagseguro.uol.com.br/v2/pre-approvals/request',
